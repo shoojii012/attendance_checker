@@ -164,3 +164,6 @@ log.csv
 mac_address_list.csv
 now_attendance.csv
 .attendance_data.csv
+
+# html files
+index.html

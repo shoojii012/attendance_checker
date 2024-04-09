@@ -82,6 +82,24 @@ def main(mac_address_list="/home/attendance_checker/mac_address_list.csv"):
         if flag is False:
             user_exit(name)
 
+    # template.htmlからテンプレート内容を読み込む
+    with open("template.html", "r") as template_file:
+        template_content = template_file.read()
+
+    # file.txtから内容を読み込む
+    with open("now_attendance.csv", "r") as attendance_file:
+        file_content = attendance_file.read()
+
+    # 改行を<br/>で置換
+    file_content = file_content.replace("\n", "<br/>\n")
+
+    # テンプレート内のプレースホルダーをfile.txtの内容で置換
+    html_content = template_content.replace("{{content}}", file_content)
+
+    # 結果をindex.htmlに保存
+    with open("index.html", "w") as output_file:
+        output_file.write(html_content)
+
 
 def user_enter(name, now_time):
     with open("now_attendance.csv", "a") as f:
