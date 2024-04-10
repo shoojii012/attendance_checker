@@ -34,4 +34,4 @@ with open("log_for_lab.csv", "w") as f:
     writer = csv.writer(f)
     writer.writerows(output_date)
 # tdatetime = datetime.datetime.strptime(tstr,"%Y年%m月%d日 %H:%M:%S")
-# print(tdatetime, type(tdatetime))
+# print(tdatetime, type(tdatetime)) 
