@@ -30,7 +30,7 @@ def main(mac_address_list="/home/attendance_checker/mac_address_list.csv"):
     # エクセルの一番上の名前行の削除
     del mac_address[0]
 
-    # arpによるWi-Fi環境下のデバイスの取得
+    # arpによるLAN環境下のデバイスの取得
     thread_list = []
     for i in range(2, 255):
         thread = PingThreading(ip_address=i)
@@ -100,13 +100,13 @@ def main(mac_address_list="/home/attendance_checker/mac_address_list.csv"):
     with open("index.html", "w") as output_file:
         output_file.write(html_content)
 
-
+#入室処理
 def user_enter(name, now_time):
     with open("now_attendance.csv", "a") as f:
         writer = csv.writer(f)
         writer.writerow([name, now_time])
 
-
+#退出処理
 def user_exit(name):
     with open("now_attendance.csv") as f:
         reader = csv.reader(f)
