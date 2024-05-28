@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+      - ./infra/db:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=app_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  django:
+    build: ./infra/app
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./django:/code
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=app
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=app_password
+
+  nginx:
+    image: nginx:1.25
+    ports:
+      - 8000:80
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - django
+
+  # celery:
+  #   build: ./infra/app
+  #   command: celery -A attendance_checker worker --loglevel=info
+  #   volumes:
+  #     - ./django:/code
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - POSTGRES_HOST=db
+  #     - POSTGRES_PORT=5432
+  #     - POSTGRES_DB=app
+  #     - POSTGRES_USER=app
+  #     - POSTGRES_PASSWORD=app_password
+
+  # celerybeat:
+  #   build: ./infra/app
+  #   command: celery -A attendance_checker beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+  #   volumes:
+  #     - ./django:/code
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - POSTGRES_HOST=db
+  #     - POSTGRES_PORT=5432
+  #     - POSTGRES_DB=app
+  #     - POSTGRES_USER=app
+  #     - POSTGRES_PASSWORD=app_password
