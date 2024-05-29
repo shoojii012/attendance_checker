@@ -1,6 +1,4 @@
-bin/
 data/
-pyvenv.cfg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
