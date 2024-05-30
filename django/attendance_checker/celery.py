@@ -2,11 +2,8 @@ from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
 from datetime import datetime
-from .models import User, Device, Log
+# from .models import User, Device, Log
 import subprocess as sp
-
-# Djangoの設定モジュールをデフォルトとして設定
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
 app = Celery('attendance_checker')
 
@@ -58,6 +55,6 @@ def log_per_minute_task(self):
     #         log = Log(datetime=now_time, user=user, is_exit=True)
     #         log.save()
 
-@app.task(bind=True)
-def generate_html(self):
-    pass
+# @app.task(bind=True)
+# def generate_html(self):
+#     pass
