@@ -2,6 +2,7 @@ import csv
 from datetime import datetime
 from django.shortcuts import render, redirect
 from .models import User, Log, Device
+from django.http import JsonResponse
 
 
 def upload_csv(request):
@@ -33,3 +34,8 @@ def user_list(request):
 def device_list(request):
     devices = Device.objects.all()
     return render(request, 'device_list.html', {'devices': devices})
+
+
+def api_user_list(request):
+    users = User.objects.all().values('name', 'is_active', 'created_at', 'updated_at')
+    return JsonResponse(list(users), safe=False)

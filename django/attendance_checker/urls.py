@@ -6,4 +6,5 @@ urlpatterns = [
     path('log-list/', views.log_list, name='log_list'),
     path('user-list/', views.user_list, name='user_list'),
     path('device-list/', views.device_list, name='device_list'),
+    path('api/users/', views.api_user_list, name='api_user_list'),
 ]
