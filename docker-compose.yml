@@ -1,11 +1,11 @@
 services:
-  db:
+  postgresql:
     image: postgres:15
     ports:
       - "55432:5432"
     volumes:
       - ./data/db:/var/lib/postgresql/data
-      - ./infra/db:/docker-entrypoint-initdb.d
+      - ./infra/postgresql:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_DB=app
       - POSTGRES_USER=app
@@ -17,32 +17,21 @@ services:
       retries: 5
 
   django:
-    build: ./infra/app
+    build: ./infra/django
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./django:/code
     depends_on:
-      db:
+      postgresql:
         condition: service_healthy
     environment:
       - POSTGRES_DB=app
       - POSTGRES_USER=app
       - POSTGRES_PASSWORD=app_password
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=postgresql
       - POSTGRES_PORT=5432
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-
-  nextjs:
-    build:
-      context: .
-      dockerfile: ./infra/nextjs/Dockerfile
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./nextjs:/app
-    depends_on:
-      - django
 
   nginx:
     image: nginx:1.25
@@ -53,8 +42,19 @@ services:
     depends_on:
       - django
 
+  # nextjs:
+  #   build:
+  #     context: .
+  #     dockerfile: ./infra/nextjs/Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./nextjs:/app
+  #   depends_on:
+  #     - django
+
   celery:
-    build: ./infra/app
+    build: ./infra/django
     command: celery -A attendance_checker worker --loglevel=info
     volumes:
       - ./django:/code
@@ -65,14 +65,14 @@ services:
       - POSTGRES_DB=app
       - POSTGRES_USER=app
       - POSTGRES_PASSWORD=app_password
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=postgresql
       - POSTGRES_PORT=5432
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - DJANGO_SETTINGS_MODULE=config.settings
 
   celerybeat:
-    build: ./infra/app
+    build: ./infra/django
     command: celery -A attendance_checker beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     volumes:
       - ./django:/code
@@ -83,7 +83,7 @@ services:
       - POSTGRES_DB=app
       - POSTGRES_USER=app
       - POSTGRES_PASSWORD=app_password
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=postgresql
       - POSTGRES_PORT=5432
       - REDIS_HOST=redis
       - REDIS_PORT=6379

@@ -5,6 +5,21 @@ from .models import User, Log, Device
 from django.http import JsonResponse
 
 
+# 　version 1
+def v1(request):
+    return render(request, 'v1.html')
+
+
+# version 2
+def home(request):
+    return render(request, 'home.html')
+
+
+def task_per_minute(request):
+
+    pass
+
+
 def upload_csv(request):
     if request.method == 'POST' and request.FILES['csv_file']:
         csv_file = request.FILES['csv_file']
@@ -27,9 +42,11 @@ def log_list(request):
     logs = Log.objects.all().order_by('datetime')
     return render(request, 'log_list.html', {'logs': logs})
 
+
 def user_list(request):
     users = User.objects.all()
     return render(request, 'user_list.html', {'users': users})
+
 
 def device_list(request):
     devices = Device.objects.all()
