@@ -1,6 +1,8 @@
-from celery import shared_task
-from .models import Device, Log
 from datetime import datetime
+
+from celery import shared_task
+
+from .models import Device, Log
 
 
 @shared_task
