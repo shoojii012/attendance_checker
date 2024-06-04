@@ -36,7 +36,7 @@ services:
   nginx:
     image: nginx:1.25
     ports:
-      - "8000:80"
+      - "2024:80"
     volumes:
       - ./infra/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
