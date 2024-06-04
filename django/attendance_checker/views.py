@@ -56,3 +56,17 @@ def device_list(request):
 def api_user_list(request):
     users = User.objects.all().values('name', 'is_active', 'created_at', 'updated_at')
     return JsonResponse(list(users), safe=False)
+
+
+def create_users_from_csv(request):
+    if request.method == 'POST' and request.FILES['csv_file']:
+        csv_file = request.FILES['csv_file']
+        decoded_file = csv_file.read().decode('utf-8').splitlines()
+        reader = csv.reader(decoded_file)
+        for row in reader:
+            name = row[0]
+            is_active = row[1].lower() == 'true'
+            User.objects.get_or_create(
+                name=name, defaults={'is_active': is_active})
+        return redirect('user_list')
+    return render(request, 'upload_users_csv.html')

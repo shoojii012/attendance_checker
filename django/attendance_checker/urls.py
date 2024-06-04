@@ -9,4 +9,5 @@ urlpatterns = [
     path('v2/user-list/', views.user_list, name='user_list'),
     path('v2/device-list/', views.device_list, name='device_list'),
     path('v2/api/users/', views.api_user_list, name='api_user_list'),
+    path('v2/api/create-users-from-csv/', views.create_users_from_csv, name='create_users_from_csv'),
 ]
