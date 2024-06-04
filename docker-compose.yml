@@ -42,17 +42,6 @@ services:
     depends_on:
       - django
 
-  # nextjs:
-  #   build:
-  #     context: .
-  #     dockerfile: ./infra/nextjs/Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./nextjs:/app
-  #   depends_on:
-  #     - django
-
   celery:
     build: ./infra/django
     command: celery -A attendance_checker worker --loglevel=info
