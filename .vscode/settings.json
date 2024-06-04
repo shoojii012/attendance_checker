@@ -1,0 +1,14 @@
+{
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "always"
+    },
+    "editor.rulers": [100]
+  },
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "isort.args": ["--settings-file", "${workspaceFolder}/django/pyproject.toml"],
+  "flake8.args": ["--config=${workspaceFolder}/django/.flake8"]
+}
