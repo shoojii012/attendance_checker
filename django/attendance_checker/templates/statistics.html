@@ -2,27 +2,72 @@
 <html>
 <head>
     <title>User Statistics</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
     <h1>This Month's Cumulative Time Ranking</h1>
-    <ul>
-        {% for user, time in monthly_ranking %}
-            <li>{{ user.name }}: {{ time }}</li>
-        {% endfor %}
-    </ul>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Cumulative Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user, time in monthly_ranking %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ time }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
     <h1>Users Currently in the Room</h1>
-    <ul>
-        {% for user in current_users %}
-            <li>{{ user.name }}</li>
-        {% endfor %}
-    </ul>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in current_users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
     <h1>Overall Cumulative Time Ranking</h1>
-    <ul>
-        {% for user, time in overall_ranking %}
-            <li>{{ user.name }}: {{ time }}</li>
-        {% endfor %}
-    </ul>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Cumulative Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user, time in overall_ranking %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ time }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
