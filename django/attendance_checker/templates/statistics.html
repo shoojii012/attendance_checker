@@ -32,9 +32,9 @@
             </tr>
         </thead>
         <tbody>
-            {% for rank, (user, time) in enumerate(monthly_ranking, start=1) %}
+            {% for user, time in monthly_ranking %}
                 <tr>
-                    <td>{{ rank }}</td>
+                    <td>{{ forloop.counter }}</td>
                     <td>{{ user.name }}</td>
                     <td>{{ time }}</td>
                 </tr>
@@ -68,9 +68,9 @@
             </tr>
         </thead>
         <tbody>
-            {% for rank, (user, time) in enumerate(overall_ranking, start=1) %}
+            {% for user, time in overall_ranking %}
                 <tr>
-                    <td>{{ rank }}</td>
+                    <td>{{ forloop.counter }}</td>
                     <td>{{ user.name }}</td>
                     <td>{{ time }}</td>
                 </tr>
