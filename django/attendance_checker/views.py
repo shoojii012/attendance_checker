@@ -4,8 +4,37 @@ from datetime import datetime
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
-from .forms import DeviceForm, UserForm
+from .forms import CSVUploadForm, DeviceForm, UserForm
 from .models import Device, Log, User
+
+
+def upload_csv(request):
+    if request.method == "POST":
+        form = CSVUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            csv_file = request.FILES["csv_file"]
+            file_data = csv_file.read().decode("utf-8")
+            csv_data = csv.reader(file_data.splitlines())
+            next(csv_data)  # Skip the header row
+
+            for row in csv_data:
+                name = row[0]
+                mac_addresses = row[1:]
+                user, created = User.objects.get_or_create(name=name)
+
+                for mac in mac_addresses:
+                    if mac:  # Skip empty MAC addresses
+                        Device.objects.get_or_create(mac_address=mac, user=user)
+
+            return redirect("upload_success")
+    else:
+        form = CSVUploadForm()
+
+    return render(request, "upload_csv.html", {"form": form})
+
+
+def upload_success(request):
+    return render(request, "success.html", {"message": "CSV file processed successfully!"})
 
 
 # 　version 1
@@ -48,22 +77,22 @@ def device_success(request):
     return render(request, "success.html", {"message": "Device created successfully!"})
 
 
-def upload_csv(request):
-    if request.method == "POST" and request.FILES["csv_file"]:
-        csv_file = request.FILES["csv_file"]
-        decoded_file = csv_file.read().decode("utf-8").splitlines()
-        reader = csv.reader(decoded_file)
-        for row in reader:
-            name = row[0]
-            enter_time = datetime.strptime(row[1], "%Y年%m月%d日 %H:%M")
-            leave_time = datetime.strptime(row[2], "%Y年%m月%d日 %H:%M")
+# def upload_csv(request):
+#     if request.method == "POST" and request.FILES["csv_file"]:
+#         csv_file = request.FILES["csv_file"]
+#         decoded_file = csv_file.read().decode("utf-8").splitlines()
+#         reader = csv.reader(decoded_file)
+#         for row in reader:
+#             name = row[0]
+#             enter_time = datetime.strptime(row[1], "%Y年%m月%d日 %H:%M")
+#             leave_time = datetime.strptime(row[2], "%Y年%m月%d日 %H:%M")
 
-            user, _ = User.objects.get_or_create(name=name)
-            Log.objects.create(datetime=enter_time, user=user)
-            Log.objects.create(datetime=leave_time, user=user)
+#             user, _ = User.objects.get_or_create(name=name)
+#             Log.objects.create(datetime=enter_time, user=user)
+#             Log.objects.create(datetime=leave_time, user=user)
 
-        return redirect("log_list")
-    return render(request, "upload_csv.html")
+#         return redirect("log_list")
+#     return render(request, "upload_csv.html")
 
 
 def log_list(request):

@@ -19,4 +19,6 @@ urlpatterns = [
     path("create_device/", views.create_device, name="create_device"),
     path("user_success/", views.user_success, name="user_success"),
     path("device_success/", views.device_success, name="device_success"),
+    path("upload_csv/", views.upload_csv, name="upload_csv"),
+    path("upload_success/", views.upload_success, name="upload_success"),
 ]

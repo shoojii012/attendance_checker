@@ -13,3 +13,7 @@ class DeviceForm(forms.ModelForm):
     class Meta:
         model = Device
         fields = ["mac_address", "user", "device_type"]
+
+
+class CSVUploadForm(forms.Form):
+    csv_file = forms.FileField()
