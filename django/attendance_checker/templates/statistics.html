@@ -10,10 +10,14 @@
         th, td {
             border: 1px solid black;
             padding: 8px;
-            text-align: left;
+            text-align: right;
         }
         th {
             background-color: #f2f2f2;
+            text-align: right;
+        }
+        th:first-child, td:first-child {
+            text-align: left;
         }
     </style>
 </head>
@@ -22,13 +26,15 @@
     <table>
         <thead>
             <tr>
+                <th>Rank</th>
                 <th>User</th>
                 <th>Cumulative Time</th>
             </tr>
         </thead>
         <tbody>
-            {% for user, time in monthly_ranking %}
+            {% for rank, (user, time) in enumerate(monthly_ranking, start=1) %}
                 <tr>
+                    <td>{{ rank }}</td>
                     <td>{{ user.name }}</td>
                     <td>{{ time }}</td>
                 </tr>
@@ -56,13 +62,15 @@
     <table>
         <thead>
             <tr>
+                <th>Rank</th>
                 <th>User</th>
                 <th>Cumulative Time</th>
             </tr>
         </thead>
         <tbody>
-            {% for user, time in overall_ranking %}
+            {% for rank, (user, time) in enumerate(overall_ranking, start=1) %}
                 <tr>
+                    <td>{{ rank }}</td>
                     <td>{{ user.name }}</td>
                     <td>{{ time }}</td>
                 </tr>
