@@ -8,6 +8,34 @@ from .forms import CSVUploadForm, DeviceForm, UserForm
 from .models import Device, Log, User
 
 
+def user_monthly_hours(request):
+    now = datetime.now()
+    start_of_month = datetime(now.year, now.month, 1)
+
+    users = User.objects.all()
+    user_data = []
+
+    for user in users:
+        logs = Log.objects.filter(user=user, datetime__gte=start_of_month, datetime__lt=now)
+
+        total_seconds = 0
+        for log in logs:
+            if log.created_at and log.updated_at:
+                total_seconds += (log.updated_at - log.created_at).total_seconds()
+
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        user_data.append(
+            {
+                "name": user.name,
+                "hours": hours,
+                "minutes": minutes,
+            }
+        )
+
+    return render(request, "user_monthly_hours.html", {"user_data": user_data})
+
+
 def upload_csv(request):
     if request.method == "POST":
         form = CSVUploadForm(request.POST, request.FILES)

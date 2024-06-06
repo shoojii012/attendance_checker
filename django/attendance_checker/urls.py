@@ -21,4 +21,5 @@ urlpatterns = [
     path("device_success/", views.device_success, name="device_success"),
     path("upload_csv/", views.upload_csv, name="upload_csv"),
     path("upload_success/", views.upload_success, name="upload_success"),
+    path("user_monthly_hours/", views.user_monthly_hours, name="user_monthly_hours"),
 ]
