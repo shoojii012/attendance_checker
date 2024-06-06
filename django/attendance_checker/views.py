@@ -1,7 +1,6 @@
 import csv
 from datetime import datetime, timedelta
 
-from django.db import IntegrityError
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
@@ -19,8 +18,17 @@ def upload_csv(request):
 
             for row in csv_data:
                 name = row[0]
-                enter_time = datetime.strptime(row[1], "%Y年%m月%d日 %H:%M")
-                exit_time = datetime.strptime(row[2], "%Y年%m月%d日 %H:%M")
+                try:
+                    enter_time = datetime.strptime(row[1], "%Y年%m月%d日 %H:%M")
+                    exit_time = datetime.strptime(row[2], "%Y年%m月%d日 %H:%M")
+                except ValueError:
+                    # 日付フォーマットが正しくない場合、スキップ
+                    continue
+
+                # 入室時間が退出時間より後の場合、その行をスキップ
+                if enter_time > exit_time:
+                    continue
+
                 user, created = User.objects.get_or_create(name=name)
 
                 current_time = enter_time
