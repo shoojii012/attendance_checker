@@ -1,6 +1,6 @@
 import csv
-from datetime import datetime
 
+from django.db import IntegrityError
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
@@ -23,8 +23,11 @@ def upload_csv(request):
                 user, created = User.objects.get_or_create(name=name)
 
                 for mac in mac_addresses:
-                    if mac:  # Skip empty MAC addresses
-                        Device.objects.get_or_create(mac_address=mac, user=user)
+                    if mac and mac.strip():  # Skip empty or None MAC addresses
+                        try:
+                            Device.objects.get_or_create(mac_address=mac.strip(), user=user)
+                        except IntegrityError:
+                            pass  # Handle the case where the mac_address is already in the database
 
             return redirect("upload_success")
     else:
