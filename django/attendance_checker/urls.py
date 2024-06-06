@@ -3,8 +3,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("", views.v1, name="v1"),
-    path("v2/", views.home, name="home"),
+    path("statistics/", views.statistics_view, name="statistics"),
+    path("v1/", views.v1, name="v1"),
+    path("", views.home, name="home"),
     # path("upload-csv/", views.upload_csv, name="upload_csv"),
     path("log-list/", views.log_list, name="log_list"),
     path("user-list/", views.user_list, name="user_list"),

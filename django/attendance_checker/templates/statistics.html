@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Statistics</title>
+</head>
+<body>
+    <h1>This Month's Cumulative Time Ranking</h1>
+    <ul>
+        {% for user, time in monthly_ranking %}
+            <li>{{ user.name }}: {{ time }}</li>
+        {% endfor %}
+    </ul>
+
+    <h1>Users Currently in the Room</h1>
+    <ul>
+        {% for user in current_users %}
+            <li>{{ user.name }}</li>
+        {% endfor %}
+    </ul>
+
+    <h1>Overall Cumulative Time Ranking</h1>
+    <ul>
+        {% for user, time in overall_ranking %}
+            <li>{{ user.name }}: {{ time }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
