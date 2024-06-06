@@ -5,7 +5,7 @@ from . import views
 urlpatterns = [
     path("", views.v1, name="v1"),
     path("v2/", views.home, name="home"),
-    path("upload-csv/", views.upload_csv, name="upload_csv"),
+    # path("upload-csv/", views.upload_csv, name="upload_csv"),
     path("log-list/", views.log_list, name="log_list"),
     path("user-list/", views.user_list, name="user_list"),
     path("device-list/", views.device_list, name="device_list"),
@@ -19,7 +19,7 @@ urlpatterns = [
     path("create_device/", views.create_device, name="create_device"),
     path("user_success/", views.user_success, name="user_success"),
     path("device_success/", views.device_success, name="device_success"),
-    path("upload_csv/", views.upload_csv, name="upload_csv"),
+    # path("upload_csv/", views.upload_csv, name="upload_csv"),
     path("upload_success/", views.upload_success, name="upload_success"),
     path("user_monthly_hours/", views.user_monthly_hours, name="user_monthly_hours"),
 ]
