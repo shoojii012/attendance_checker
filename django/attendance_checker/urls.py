@@ -15,7 +15,7 @@ urlpatterns = [
         views.create_users_from_csv,
         name="create_users_from_csv",
     ),
-    path("admin/create_user/", views.create_user, name="create_user"),
+    path("create_user/", views.create_user, name="create_user"),
     path("create_device/", views.create_device, name="create_device"),
     path("user_success/", views.user_success, name="user_success"),
     path("device_success/", views.device_success, name="device_success"),
