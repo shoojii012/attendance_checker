@@ -11,14 +11,14 @@ from .models import Device, Log, User
 
 class PingThreading(threading.Thread):
     def __init__(self, ip_address):
+        super().__init__()
         self.ip_address = ip_address
-        threading.Thread.__init__(self)
 
     def run(self):
         if platform.system() == "Linux":
-            sp.run(["ping", "-c", "1", "-w", "1", "192.168.10." + str(self.ip_address)])
+            sp.run(["ping", "-c", "1", "-w", "1", f"192.168.10.{self.ip_address}"])
         elif platform.system() == "Darwin":
-            sp.run(["ping", "-c", "1", "-W", "1", "192.168.10." + str(self.ip_address)])
+            sp.run(["ping", "-c", "1", "-W", "1", f"192.168.10.{self.ip_address}"])
         else:
             print("Unsupported OS")
 
@@ -26,43 +26,25 @@ class PingThreading(threading.Thread):
 @shared_task
 def check_attendance():
     devices = Device.objects.all()
-
-    # arpによるLAN環境下のデバイスの取得
     thread_list = []
+
     for i in range(2, 255):
         thread = PingThreading(ip_address=i)
         thread.start()
         thread_list.append(thread)
+
     for thread in thread_list:
         thread.join()
-    output = (sp.run(["arp", "-a"], capture_output=True, text=True)).stdout
 
+    output = sp.run(["arp", "-a"], capture_output=True, text=True).stdout
     now_time = timezone.now()
-    active_users = set()
+    active_users = {device.user for device in devices if device.mac_address in output}
 
-    for device in devices:
-        if device.mac_address in output:
-            active_users.add(device.user)
-            log_attendance(device.user, now_time, entering=True)
-
-    update_attendance(active_users, now_time)
+    for user in User.objects.filter(is_active=True):
+        log_attendance(user, now_time, entering=(user in active_users))
 
 
 def log_attendance(user, now_time, entering):
-    if entering:
-        Log.objects.create(datetime=now_time, user=user)
-        print(f"{user.name} entered at {now_time}")
-    else:
-        Log.objects.create(datetime=now_time, user=user)
-        print(f"{user.name} exited at {now_time}")
-
-
-def update_attendance(active_users, now_time):
-    all_users = User.objects.filter(is_active=True)
-    for user in all_users:
-        if user in active_users:
-            # ユーザーが現在アクティブなら何もしない
-            pass
-        else:
-            # ユーザーがアクティブでないなら、退出ログを記録
-            log_attendance(user, now_time, entering=False)
+    Log.objects.create(datetime=now_time, user=user)
+    action = "entered" if entering else "exited"
+    print(f"{user.name} {action} at {now_time}")
