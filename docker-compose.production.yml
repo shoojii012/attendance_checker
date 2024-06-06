@@ -10,7 +10,11 @@ services:
       - POSTGRES_USER=attendance_checker_user
       - POSTGRES_PASSWORD=attendance_checker_password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d attendance_checker -U attendance_checker_user"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -d attendance_checker -U attendance_checker_user",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,6 +27,7 @@ services:
              python manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./django:/code
+      - /home/attendance_checker/index.html:/code/attendance_checker/templates/v1.html
     depends_on:
       postgresql:
         condition: service_healthy

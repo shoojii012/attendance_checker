@@ -1,9 +1,11 @@
 import csv
 from datetime import datetime
 
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
+from .forms import DeviceForm, UserForm
 from .models import Device, Log, User
 
 
@@ -17,8 +19,38 @@ def home(request):
     return render(request, "home.html")
 
 
-def task_per_minute(request):
-    pass
+@login_required
+def create_user(request):
+    if request.method == "POST":
+        user_form = UserForm(request.POST)
+        if user_form.is_valid():
+            user_form.save()
+            return redirect("user_success")
+    else:
+        user_form = UserForm()
+    return render(request, "create_user.html", {"user_form": user_form})
+
+
+@login_required
+def create_device(request):
+    if request.method == "POST":
+        device_form = DeviceForm(request.POST)
+        if device_form.is_valid():
+            device_form.save()
+            return redirect("device_success")
+    else:
+        device_form = DeviceForm()
+    return render(request, "create_device.html", {"device_form": device_form})
+
+
+@login_required
+def user_success(request):
+    return render(request, "success.html", {"message": "User created successfully!"})
+
+
+@login_required
+def device_success(request):
+    return render(request, "success.html", {"message": "Device created successfully!"})
 
 
 def upload_csv(request):
