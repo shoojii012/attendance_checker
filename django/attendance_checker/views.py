@@ -1,11 +1,9 @@
 import csv
 from datetime import datetime
 
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
-from .decorators import admin_required
 from .forms import DeviceForm, UserForm
 from .models import Device, Log, User
 
@@ -20,8 +18,6 @@ def home(request):
     return render(request, "home.html")
 
 
-@login_required
-@admin_required
 def create_user(request):
     if request.method == "POST":
         user_form = UserForm(request.POST)
@@ -33,8 +29,6 @@ def create_user(request):
     return render(request, "create_user.html", {"user_form": user_form})
 
 
-@login_required
-@admin_required
 def create_device(request):
     if request.method == "POST":
         device_form = DeviceForm(request.POST)
@@ -46,14 +40,10 @@ def create_device(request):
     return render(request, "create_device.html", {"device_form": device_form})
 
 
-@login_required
-@admin_required
 def user_success(request):
     return render(request, "success.html", {"message": "User created successfully!"})
 
 
-@login_required
-@admin_required
 def device_success(request):
     return render(request, "success.html", {"message": "Device created successfully!"})
 
