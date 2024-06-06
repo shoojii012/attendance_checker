@@ -38,13 +38,11 @@ def check_attendance():
 
     output = sp.run(["arp", "-a"], capture_output=True, text=True).stdout
     now_time = timezone.now()
-    active_users = {device.user for device in devices if device.mac_address in output}
+    active_users = {
+        device.user for device in devices if device.mac_address.lower() in output.lower()
+    }
 
     for user in User.objects.filter(is_active=True):
-        log_attendance(user, now_time, entering=(user in active_users))
-
-
-def log_attendance(user, now_time, entering):
-    Log.objects.create(datetime=now_time, user=user)
-    action = "entered" if entering else "exited"
-    print(f"{user.name} {action} at {now_time}")
+        if user in active_users:
+            Log.objects.create(datetime=now_time, user=user)
+            print(f"{user.name} entered at {now_time}")
