@@ -18,13 +18,12 @@ def user_monthly_hours(request):
     for user in users:
         logs = Log.objects.filter(user=user, datetime__gte=start_of_month, datetime__lt=now)
 
-        total_seconds = 0
-        for log in logs:
-            if log.created_at and log.updated_at:
-                total_seconds += (log.updated_at - log.created_at).total_seconds()
+        total_minutes = (
+            logs.count()
+        )  # 各ログは1分ごとに生成されているため、ログの数がそのまま滞在分数になる
+        hours = total_minutes // 60
+        minutes = total_minutes % 60
 
-        hours = total_seconds // 3600
-        minutes = (total_seconds % 3600) // 60
         user_data.append(
             {
                 "name": user.name,
