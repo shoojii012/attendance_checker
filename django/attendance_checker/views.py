@@ -35,39 +35,39 @@ def user_monthly_hours(request):
     return render(request, "user_monthly_hours.html", {"user_data": user_data})
 
 
-def upload_csv(request):
-    if request.method == "POST":
-        form = CSVUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            csv_file = request.FILES["csv_file"]
-            file_data = csv_file.read().decode("utf-8")
-            csv_data = csv.reader(file_data.splitlines())
+# def upload_csv(request):
+#     if request.method == "POST":
+#         form = CSVUploadForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             csv_file = request.FILES["csv_file"]
+#             file_data = csv_file.read().decode("utf-8")
+#             csv_data = csv.reader(file_data.splitlines())
 
-            for row in csv_data:
-                name = row[0]
-                try:
-                    enter_time = datetime.strptime(row[1], "%Y年%m月%d日 %H:%M")
-                    exit_time = datetime.strptime(row[2], "%Y年%m月%d日 %H:%M")
-                except ValueError:
-                    # 日付フォーマットが正しくない場合、スキップ
-                    continue
+#             for row in csv_data:
+#                 name = row[0]
+#                 try:
+#                     enter_time = datetime.strptime(row[1], "%Y年%m月%d日 %H:%M")
+#                     exit_time = datetime.strptime(row[2], "%Y年%m月%d日 %H:%M")
+#                 except ValueError:
+#                     # 日付フォーマットが正しくない場合、スキップ
+#                     continue
 
-                # 入室時間が退出時間より後の場合、その行をスキップ
-                if enter_time > exit_time:
-                    continue
+#                 # 入室時間が退出時間より後の場合、その行をスキップ
+#                 if enter_time > exit_time:
+#                     continue
 
-                user, created = User.objects.get_or_create(name=name)
+#                 user, created = User.objects.get_or_create(name=name)
 
-                current_time = enter_time
-                while current_time <= exit_time:
-                    Log.objects.create(datetime=current_time, user=user)
-                    current_time += timedelta(minutes=1)
+#                 current_time = enter_time
+#                 while current_time <= exit_time:
+#                     Log.objects.create(datetime=current_time, user=user)
+#                     current_time += timedelta(minutes=1)
 
-            return redirect("upload_success")
-    else:
-        form = CSVUploadForm()
+#             return redirect("upload_success")
+#     else:
+#         form = CSVUploadForm()
 
-    return render(request, "upload_csv.html", {"form": form})
+#     return render(request, "upload_csv.html", {"form": form})
 
 
 # def upload_csv(request):
