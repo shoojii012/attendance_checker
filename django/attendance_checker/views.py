@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime, timedelta
 
 from django.db import IntegrityError
 from django.http import JsonResponse
@@ -15,25 +16,51 @@ def upload_csv(request):
             csv_file = request.FILES["csv_file"]
             file_data = csv_file.read().decode("utf-8")
             csv_data = csv.reader(file_data.splitlines())
-            next(csv_data)  # Skip the header row
 
             for row in csv_data:
                 name = row[0]
-                mac_addresses = row[1:]
+                enter_time = datetime.strptime(row[1], "%Y年%m月%d日 %H:%M")
+                exit_time = datetime.strptime(row[2], "%Y年%m月%d日 %H:%M")
                 user, created = User.objects.get_or_create(name=name)
 
-                for mac in mac_addresses:
-                    if mac and mac.strip():  # Skip empty or None MAC addresses
-                        try:
-                            Device.objects.get_or_create(mac_address=mac.strip(), user=user)
-                        except IntegrityError:
-                            pass  # Handle the case where the mac_address is already in the database
+                current_time = enter_time
+                while current_time <= exit_time:
+                    Log.objects.create(datetime=current_time, user=user)
+                    current_time += timedelta(minutes=1)
 
             return redirect("upload_success")
     else:
         form = CSVUploadForm()
 
     return render(request, "upload_csv.html", {"form": form})
+
+
+# def upload_csv(request):
+#     if request.method == "POST":
+#         form = CSVUploadForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             csv_file = request.FILES["csv_file"]
+#             file_data = csv_file.read().decode("utf-8")
+#             csv_data = csv.reader(file_data.splitlines())
+#             next(csv_data)  # Skip the header row
+
+#             for row in csv_data:
+#                 name = row[0]
+#                 mac_addresses = row[1:]
+#                 user, created = User.objects.get_or_create(name=name)
+
+#                 for mac in mac_addresses:
+#                     if mac and mac.strip():  # Skip empty or None MAC addresses
+#                         try:
+#                             Device.objects.get_or_create(mac_address=mac.strip(), user=user)
+#                         except IntegrityError:
+#                             pass  # Handle the case where the mac_address is already in the database
+
+#             return redirect("upload_success")
+#     else:
+#         form = CSVUploadForm()
+
+#     return render(request, "upload_csv.html", {"form": form})
 
 
 def upload_success(request):
