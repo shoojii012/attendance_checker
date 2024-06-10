@@ -45,7 +45,7 @@ services:
     network_mode: "host"
     volumes:
       - ./infra/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./django/static/statistics.html:/var/www/html/index.html
+      - ./django/ssg/statistics.html:/var/www/html/index.html
     depends_on:
       - django
 
