@@ -3,7 +3,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("", views.ssg, name="statistics"),
+    path("", views.ssg, name=""),
     path("v1/", views.v1, name="v1"),
     # path("t", views.home, name="home"),
     # path("upload-csv/", views.upload_csv, name="upload_csv"),
