@@ -10,8 +10,6 @@ urlpatterns = [
         "distill/",
         views.statistics_view,
         name="statics_view",
-        distill_func=None,
-        distill_file="index.html",
     ),
     path("v1/", views.v1, name="v1"),
     # path("t", views.home, name="home"),
