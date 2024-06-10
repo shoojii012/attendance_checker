@@ -65,6 +65,10 @@ def user_monthly_hours(request):
     return render(request, "user_monthly_hours.html", {"user_data": user_data})
 
 
+def ssg(request):
+    return render(request, "statistics.html")
+
+
 # def upload_csv(request):
 #     if request.method == "POST":
 #         form = CSVUploadForm(request.POST, request.FILES)

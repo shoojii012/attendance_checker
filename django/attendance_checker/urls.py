@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("", views.statistics_view, name="statistics"),
+    path("ssg/", views.ssg, name="statistics"),
     path("v1/", views.v1, name="v1"),
     # path("t", views.home, name="home"),
     # path("upload-csv/", views.upload_csv, name="upload_csv"),
