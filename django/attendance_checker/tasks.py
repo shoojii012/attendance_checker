@@ -4,6 +4,7 @@ import threading
 
 from celery import shared_task
 
+from django.core.management import call_command
 from django.utils import timezone
 
 from .models import Device, Log, User
@@ -46,3 +47,8 @@ def check_attendance():
         if user in active_users:
             Log.objects.create(datetime=now_time, user=user)
             print(f"{user.name} entered at {now_time}")
+
+
+@shared_task
+def generate_static_site():
+    call_command("distill-local")
