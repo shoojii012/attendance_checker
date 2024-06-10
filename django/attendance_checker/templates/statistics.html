@@ -16,14 +16,8 @@
         h1 {
             text-align: center;
         }
-        .table-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
         table {
-            width: 80%;
+            width: 50%;
             border-collapse: collapse;
             margin: 20px 0;
         }
@@ -40,74 +34,67 @@
             text-align: left;
         }
         @media (min-width: 768px) {
-            .table-container {
-                flex-direction: row;
-                justify-content: space-around;
-            }
-            table {
-                width: 30%;
-            }
-            h1 {
-                display: none;
+            body {
+                font-size: 10px;
             }
         }
     </style>
 </head>
 <body>
     <h1>Users Currently in the Room</h1>
-    <div class="table-container">
-        <table>
-            <thead>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in current_users %}
                 <tr>
-                    <th>User</th>
+                    <td>{{ user.name }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for user in current_users %}
-                    <tr>
-                        <td>{{ user.name }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            {% endfor %}
+        </tbody>
+    </table>
 
-        <table>
-            <thead>
+    <h1>This Month's Cumulative Time Ranking</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Cumulative Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user, time in monthly_ranking %}
                 <tr>
-                    <th>Rank</th>
-                    <th>User</th>
-                    <th>Cumulative Time</th>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ time }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for user, time in monthly_ranking %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ user.name }}</td>
-                        <td>{{ time }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            {% endfor %}
+        </tbody>
+    </table>
 
-        <table>
-            <thead>
+    <h1>Overall Cumulative Time Ranking</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Cumulative Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user, time in overall_ranking %}
                 <tr>
-                    <th>Rank</th>
-                    <th>User</th>
-                    <th>Cumulative Time</th>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ time }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for user, time in overall_ranking %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ user.name }}</td>
-                        <td>{{ time }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
