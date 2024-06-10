@@ -81,9 +81,7 @@ def generate_statistics_html():
         "overall_ranking": cumulative_time_overall(),
     }
     html_content = render_to_string("statistics.html", context)
-    output_path = os.path.join(
-        settings.BASE_DIR, "attendance_checker", "templates", "statistics.html"
-    )
+    output_path = os.path.join(settings.BASE_DIR, "attendance_checker", "templates", "index.html")
 
     with open(output_path, "w") as static_file:
         static_file.write(html_content)

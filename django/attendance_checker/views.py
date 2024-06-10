@@ -66,7 +66,7 @@ def user_monthly_hours(request):
 
 
 def ssg(request):
-    return render(request, "statistics.html")
+    return render(request, "index.html")
 
 
 # def upload_csv(request):
