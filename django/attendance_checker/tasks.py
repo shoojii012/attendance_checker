@@ -1,10 +1,13 @@
+import os
 import platform
 import subprocess as sp
 import threading
+from datetime import timedelta
 
 from celery import shared_task
 
-from django.core.management import call_command
+from django.conf import settings
+from django.template.loader import render_to_string
 from django.utils import timezone
 
 from .models import Device, Log, User
@@ -49,6 +52,38 @@ def check_attendance():
             print(f"{user.name} entered at {now_time}")
 
 
+def cumulative_time_this_month():
+    users = User.objects.all()
+    user_times = [(user, user.cumulative_time_this_month()) for user in users]
+    user_times.sort(key=lambda x: x[1], reverse=True)
+    return user_times
+
+
+def cumulative_time_overall():
+    users = User.objects.all()
+    user_times = [(user, user.cumulative_time_overall()) for user in users]
+    user_times.sort(key=lambda x: x[1], reverse=True)
+    return user_times
+
+
+def current_users():
+    now = timezone.now()
+    active_logs = Log.objects.filter(datetime__gte=now - timedelta(minutes=1))
+    active_users = {log.user for log in active_logs}
+    return active_users
+
+
 @shared_task
-def generate_static_site():
-    call_command("distill-local")
+def generate_statistics_html():
+    context = {
+        "monthly_ranking": cumulative_time_this_month(),
+        "current_users": current_users(),
+        "overall_ranking": cumulative_time_overall(),
+    }
+    html_content = render_to_string("statistics.html", context)
+    output_path = os.path.join(settings.BASE_DIR, "static", "statistics.html")
+
+    with open(output_path, "w") as static_file:
+        static_file.write(html_content)
+
+    return output_path

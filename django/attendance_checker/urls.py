@@ -1,16 +1,9 @@
-from django_distill import distill_path
-
 from django.urls import path
 
 from . import views
 
 urlpatterns = [
     path("", views.statistics_view, name="statistics"),
-    distill_path(
-        "distill/",
-        views.statistics_view,
-        name="statics_view",
-    ),
     path("v1/", views.v1, name="v1"),
     # path("t", views.home, name="home"),
     # path("upload-csv/", views.upload_csv, name="upload_csv"),

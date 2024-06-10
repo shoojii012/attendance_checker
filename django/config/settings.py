@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     "attendance_checker",
     "corsheaders",
     "rest_framework",
-    "django_distill",
 ]
 
 MIDDLEWARE = [
