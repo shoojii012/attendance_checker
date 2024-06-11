@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
-from celery.schedules import crontab
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -144,22 +142,6 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
-CELERY_BEAT_SCHEDULE = {
-    "send-monthly-report": {
-        "task": "attendance_checker.send_monthly_report",
-        # "schedule": crontab(hour="0", minute="0", day_of_month="1"),
-        "schedule": crontab(minute="*/5"),
-        # day_of_month=1にすることで、毎月1日の午前0時に実行
-    },
-    "check_attendance": {
-        "task": "attendance_checker.check_attendance",
-        "schedule": crontab(minute="*"),  # 毎分実行
-    },
-    "generate_statistics_html": {
-        "task": "attendance_checker.generate_statistics_html",
-        "schedule": crontab(minute="*"),  # 毎分実行
-    },
-}
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
