@@ -41,7 +41,7 @@ def current_users():
     now = timezone.now()
     active_logs = Log.objects.filter(datetime__gte=now - timedelta(minutes=1))
     active_users = {log.user for log in active_logs if log.user is not None}
-    sorted_active_users = sorted(active_users, key=lambda user: user.created_at, reverse=True)
+    sorted_active_users = sorted(active_users, key=lambda user: user.created_at)
     return sorted_active_users
 
 
