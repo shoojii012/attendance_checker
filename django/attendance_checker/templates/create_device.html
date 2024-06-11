@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Device</title>
+</head>
+<body>
+    <h1>Create Device</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ device_form.as_p }}
+        <button type="submit">Create Device</button>
+    </form>
+</body>
+</html>
