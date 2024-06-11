@@ -153,11 +153,11 @@ CELERY_BEAT_SCHEDULE = {
     },
     "check_attendance": {
         "task": "attendance_checker.check_attendance",
-        "schedule": crontab(minute="*/1"),  # 毎分実行
+        "schedule": crontab(minute="*"),  # 毎分実行
     },
     "generate_statistics_html": {
         "task": "attendance_checker.generate_statistics_html",
-        "schedule": crontab(minute="*/1"),  # 毎分実行
+        "schedule": crontab(minute="*"),  # 毎分実行
     },
 }
 
