@@ -1,6 +1,7 @@
 import platform
 import subprocess as sp
 import threading
+from collections import defaultdict
 from datetime import timedelta
 
 from django.utils import timezone
@@ -42,3 +43,26 @@ def current_users():
     active_users = {log.user for log in active_logs if log.user is not None}
     sorted_active_users = sorted(active_users, key=lambda user: user.created_at, reverse=True)
     return sorted_active_users
+
+
+# 月末メール送信用
+def calculate_user_activity(start_date, end_date):
+    users = User.objects.all()
+    report_data = defaultdict(list)
+
+    for user in users:
+        logs = Log.objects.filter(
+            user=user, datetime__gte=start_date, datetime__lte=end_date
+        ).order_by("datetime")
+        day_logs = defaultdict(list)
+
+        for log in logs:
+            log_date = log.datetime.date()
+            day_logs[log_date].append(log.datetime)
+
+        for log_date, times in day_logs.items():
+            first_entry = times[0]
+            last_exit = times[-1]
+            report_data[user.name].append((log_date, first_entry, last_exit))
+
+    return report_data

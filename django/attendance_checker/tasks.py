@@ -1,14 +1,17 @@
 import os
 import subprocess as sp
+from datetime import timedelta
 
 from celery import shared_task
 
 from django.conf import settings
+from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
 
 from .helper import (
     PingThreading,
+    calculate_user_activity,
     cumulative_time_overall,
     cumulative_time_this_month,
     current_users,
@@ -55,3 +58,28 @@ def generate_statistics_html():
         static_file.write(html_content)
 
     return output_path
+
+
+@shared_task
+def send_monthly_report():
+    now = timezone.now()
+    first_day_of_current_month = now.replace(day=1)
+    last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+    first_day_of_previous_month = last_day_of_previous_month.replace(day=1)
+
+    report_data = calculate_user_activity(first_day_of_previous_month, last_day_of_previous_month)
+
+    email_content = "Monthly Report\n\n"
+    for user_name, entries in report_data.items():
+        email_content += f"User: {user_name}\n"
+        for entry in entries:
+            email_content += f"Date: {entry[0]}, First Entry: {entry[1]}, Last Exit: {entry[2]}\n"
+        email_content += "\n"
+
+    send_mail(
+        "Monthly User Activity Report",
+        email_content,
+        settings.DEFAULT_FROM_EMAIL,
+        ["to@example.com"],
+        fail_silently=False,
+    )
