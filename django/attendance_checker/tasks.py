@@ -3,15 +3,17 @@ import subprocess as sp
 from datetime import timedelta
 
 from celery import shared_task
+from openpyxl import Workbook
+from openpyxl.styles import Border, Font, Side
+from openpyxl.utils import get_column_letter
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.db.models import Count
 from django.template.loader import render_to_string
 from django.utils import timezone
 
 from .helper import (
     PingThreading,
-    calculate_user_activity,
     cumulative_time_overall,
     cumulative_time_this_month,
     current_users,
@@ -61,25 +63,108 @@ def generate_statistics_html():
 
 
 @shared_task
-def send_monthly_report():
+def generate_monthly_report():
     now = timezone.now()
-    first_day_of_current_month = now.replace(day=1)
+    first_day_of_current_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
-    first_day_of_previous_month = last_day_of_previous_month.replace(day=1)
-
-    report_data = calculate_user_activity(first_day_of_previous_month, last_day_of_previous_month)
-
-    email_content = "Monthly Report\n\n"
-    for user_name, entries in report_data.items():
-        email_content += f"User: {user_name}\n"
-        for entry in entries:
-            email_content += f"Date: {entry[0]}, First Entry: {entry[1]}, Last Exit: {entry[2]}\n"
-        email_content += "\n"
-
-    send_mail(
-        "Monthly User Activity Report",
-        email_content,
-        settings.DEFAULT_FROM_EMAIL,
-        ["to@example.com"],
-        fail_silently=False,
+    first_day_of_previous_month = last_day_of_previous_month.replace(
+        day=1, hour=0, minute=0, second=0, microsecond=0
     )
+
+    # Excelファイルのパスを設定
+    excel_filename = f"monthly_report_{last_day_of_previous_month.strftime('%Y%m')}.xlsx"
+    excel_filepath = os.path.join(settings.MEDIA_ROOT, "reports", excel_filename)
+
+    # ディレクトリが存在しない場合は作成
+    os.makedirs(os.path.dirname(excel_filepath), exist_ok=True)
+
+    # ワークブックとシートの作成
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Monthly Report"
+
+    # ヘッダーの設定
+    headers = ["Name", "Date", "First Entry", "Last Exit", "Duration"]
+    for col, header in enumerate(headers, start=1):
+        cell = ws.cell(row=1, column=col, value=header)
+        cell.font = Font(bold=True)
+        cell.border = Border(bottom=Side(style="thin"))
+
+    # データの書き込み
+    row = 2
+    users = User.objects.filter(is_active=True)
+    for user in users:
+        logs = Log.objects.filter(
+            user=user,
+            datetime__gte=first_day_of_previous_month,
+            datetime__lt=first_day_of_current_month,
+        ).order_by("datetime")
+
+        # 日ごとのログ数をカウント
+        daily_log_counts = logs.values("datetime__date").annotate(count=Count("id"))
+        daily_log_counts = {item["datetime__date"]: item["count"] for item in daily_log_counts}
+
+        if logs.exists():
+            date = None
+            first_entry = None
+            last_exit = None
+            for log in logs:
+                log_date = log.datetime.date()
+                log_time = log.datetime.time()
+                if date != log_date:
+                    if date:
+                        log_count = daily_log_counts.get(date, 0)
+                        duration = timedelta(minutes=log_count)
+                        duration_str = f"{duration.seconds // 3600:02d}:{(duration.seconds % 3600) // 60:02d}:00"
+                        ws.append(
+                            [
+                                user.username,
+                                date.strftime("%Y/%m/%d"),
+                                first_entry.strftime("%H:%M"),
+                                last_exit.strftime("%H:%M"),
+                                duration_str,
+                            ]
+                        )
+                        row += 1
+                    date = log_date
+                    first_entry = log_time
+                last_exit = log_time
+
+            # 最後の日のデータを書き込み
+            if date:
+                log_count = daily_log_counts.get(date, 0)
+                duration = timedelta(minutes=log_count)
+                duration_str = (
+                    f"{duration.seconds // 3600:02d}:{(duration.seconds % 3600) // 60:02d}:00"
+                )
+                ws.append(
+                    [
+                        user.username,
+                        date.strftime("%Y/%m/%d"),
+                        first_entry.strftime("%H:%M"),
+                        last_exit.strftime("%H:%M"),
+                        duration_str,
+                    ]
+                )
+                row += 1
+
+    # 列幅の自動調整
+    for column in ws.columns:
+        max_length = 0
+        column_letter = get_column_letter(column[0].column)
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except:
+                pass
+        adjusted_width = max_length + 2
+        ws.column_dimensions[column_letter].width = adjusted_width
+
+    # フィルターの追加
+    ws.auto_filter.ref = f"A1:E{row-1}"
+
+    # ファイルの保存
+    wb.save(excel_filepath)
+    print(f"Monthly report generated and saved to {excel_filepath}")
+    return excel_filepath
