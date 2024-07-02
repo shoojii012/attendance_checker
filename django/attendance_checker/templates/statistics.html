@@ -1,23 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Statistics</title>
     <style>
         body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0;
-            padding: 0;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            font-size: 16px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .table-wrapper {
             width: 100%;
-            font-size: 32px;
+            margin-bottom: 20px;
         }
         h1 {
             text-align: center;
+            font-size: 24px;
         }
         table {
-            width: 50%;
+            width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
         }
@@ -39,69 +47,89 @@
         .absent {
             color: red;
         }
+
+        @media (min-width: 1024px) {
+            .table-wrapper {
+                width: 31%;
+            }
+            body {
+                font-size: 14px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>All User Status</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Status</th>
-                <th>Last Seen</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for status in user_status %}
-                <tr>
-                    <td>{{ status.user.name }}</td>
-                    <td class="{% if status.is_present %}present{% else %}absent{% endif %}">
-                        {% if status.is_present %}Present{% else %}Absent{% endif %}
-                    </td>
-                    <td>{{ status.last_seen|default_if_none:"N/A"|date:"Y-m-d H:i:s" }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="container">
+        <div class="table-wrapper">
+            <h1>All User Status</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Status</th>
+                        <th>Last Seen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for status in user_status %}
+                        <tr>
+                            <td>{{ status.user.name }}</td>
+                            <td class="{% if status.is_present %}present{% else %}absent{% endif %}">
+                                {% if status.is_present %}Present{% else %}Absent{% endif %}
+                            </td>
+                            <td>{{ status.last_seen|default_if_none:"N/A"|date:"Y-m-d H:i:s" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <h1>This Month's Cumulative Time Ranking</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>User</th>
-                <th>Cumulative Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user, time in monthly_ranking %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ user.name }}</td>
-                    <td>{{ time }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <div class="table-wrapper">
+            <h1>This Month's Cumulative Time Ranking</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>User</th>
+                        <th>Cumulative Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user, time in monthly_ranking %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ user.name }}</td>
+                            <td>{{ time }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <h1>Overall Cumulative Time Ranking</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>User</th>
-                <th>Cumulative Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user, time in overall_ranking %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ user.name }}</td>
-                    <td>{{ time }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <div class="table-wrapper">
+            <h1>Overall Cumulative Time Ranking</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>User</th>
+                        <th>Cumulative Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user, time in overall_ranking %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ user.name }}</td>
+                            <td>{{ time }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>
