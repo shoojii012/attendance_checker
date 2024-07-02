@@ -19,7 +19,6 @@ from .helper import (
     cumulative_time_overall,
     cumulative_time_this_month,
     current_status,
-    current_users,
 )
 from .models import Device, Log, User
 
@@ -53,7 +52,6 @@ def check_attendance():
 def generate_statistics_html():
     context = {
         "monthly_ranking": cumulative_time_this_month(),
-        "current_users": current_users(),
         "overall_ranking": cumulative_time_overall(),
         "user_status": current_status(),
     }

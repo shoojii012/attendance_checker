@@ -52,7 +52,7 @@ def current_status():
     for user in users:
         last_log = Log.objects.filter(user=user).order_by("-datetime").first()
         is_present = last_log and (timezone.now() - last_log.datetime) <= timedelta(minutes=1)
-        last_seen = last_log.datetime if last_log else None
+        last_seen = timezone.localtime(last_log.datetime) if last_log else None
         user_status.append({"user": user, "is_present": is_present, "last_seen": last_seen})
 
     return user_status

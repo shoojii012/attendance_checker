@@ -58,23 +58,7 @@
                     <td class="{% if status.is_present %}present{% else %}absent{% endif %}">
                         {% if status.is_present %}Present{% else %}Absent{% endif %}
                     </td>
-                    <td>{{ status.last_seen|default_if_none:"N/A" }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <h1>Users Currently in the Room</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>User</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in current_users %}
-                <tr>
-                    <td>{{ user.name }}</td>
+                    <td>{{ status.last_seen|default_if_none:"N/A"|date:"Y-m-d H:i:s" }}</td>
                 </tr>
             {% endfor %}
         </tbody>
