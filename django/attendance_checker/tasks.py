@@ -10,6 +10,7 @@ from openpyxl.utils import get_column_letter
 
 from django.conf import settings
 from django.db.models import Count
+from django.db.models.functions import TruncDate
 from django.template.loader import render_to_string
 from django.utils import timezone
 
@@ -97,8 +98,13 @@ def generate_monthly_report_csv():
             ).order_by("datetime")
 
             # 日ごとのログ数をカウント
-            daily_log_counts = logs.values("datetime__date").annotate(count=Count("id"))
-            daily_log_counts = {item["datetime__date"]: item["count"] for item in daily_log_counts}
+            daily_log_counts = (
+                logs.annotate(date=TruncDate("datetime"))
+                .values("date")
+                .annotate(count=Count("id"))
+                .order_by("date")
+            )
+            daily_log_counts = {item["date"]: item["count"] for item in daily_log_counts}
 
             if logs.exists():
                 date = None
@@ -111,7 +117,6 @@ def generate_monthly_report_csv():
                         if date:
                             log_count = daily_log_counts.get(date, 0)
                             duration = timedelta(minutes=log_count)
-                            print(f"{user.name}:{date}:{duration}:{duration.seconds}")
                             duration_str = f"{duration.seconds // 3600:02d}:{(duration.seconds % 3600) // 60:02d}:00"
                             writer.writerow(
                                 [
