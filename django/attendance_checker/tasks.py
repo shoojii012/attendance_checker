@@ -111,7 +111,7 @@ def generate_monthly_report_csv():
                         if date:
                             log_count = daily_log_counts.get(date, 0)
                             duration = timedelta(minutes=log_count)
-                            print(f"{user.name}:{date}:{duration.seconds}")
+                            print(f"{user.name}:{date}:{duration}:{duration.seconds}")
                             duration_str = f"{duration.seconds // 3600:02d}:{(duration.seconds % 3600) // 60:02d}:00"
                             writer.writerow(
                                 [
