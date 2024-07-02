@@ -18,6 +18,7 @@ from .helper import (
     PingThreading,
     cumulative_time_overall,
     cumulative_time_this_month,
+    current_status,
     current_users,
 )
 from .models import Device, Log, User
@@ -54,6 +55,7 @@ def generate_statistics_html():
         "monthly_ranking": cumulative_time_this_month(),
         "current_users": current_users(),
         "overall_ranking": cumulative_time_overall(),
+        "user_status": current_status(),
     }
     html_content = render_to_string("statistics.html", context)
     output_path = os.path.join(settings.BASE_DIR, "attendance_checker", "templates", "index.html")

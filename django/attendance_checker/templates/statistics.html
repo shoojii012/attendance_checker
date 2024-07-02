@@ -33,9 +33,37 @@
         th:first-child, td:first-child {
             text-align: left;
         }
+        .present {
+            color: green;
+        }
+        .absent {
+            color: red;
+        }
     </style>
 </head>
 <body>
+    <h1>All User Status</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Status</th>
+                <th>Last Seen</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for status in user_status %}
+                <tr>
+                    <td>{{ status.user.name }}</td>
+                    <td class="{% if status.is_present %}present{% else %}absent{% endif %}">
+                        {% if status.is_present %}Present{% else %}Absent{% endif %}
+                    </td>
+                    <td>{{ status.last_seen|default_if_none:"N/A" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
     <h1>Users Currently in the Room</h1>
     <table>
         <thead>
