@@ -1,3 +1,4 @@
+import csv
 import os
 import subprocess as sp
 from datetime import timedelta
@@ -63,7 +64,90 @@ def generate_statistics_html():
 
 
 @shared_task
-def generate_monthly_report():
+def generate_monthly_report_csv():
+
+    now = timezone.localtime()
+    first_day_of_current_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+    first_day_of_previous_month = last_day_of_previous_month.replace(
+        day=1, hour=0, minute=0, second=0, microsecond=0
+    )
+
+    # CSVファイルのパスを設定
+    csv_filename = f"monthly_report_{last_day_of_previous_month.strftime('%Y%m')}.csv"
+    csv_filepath = os.path.join(settings.MEDIA_ROOT, "reports", csv_filename)
+
+    # ディレクトリが存在しない場合は作成
+    os.makedirs(os.path.dirname(csv_filepath), exist_ok=True)
+
+    # CSVファイルを書き込みモードでオープン
+    with open(csv_filepath, "w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile)
+
+        # ヘッダーの書き込み
+        headers = ["Name", "Date", "First Entry", "Last Exit", "Duration"]
+        writer.writerow(headers)
+
+        users = User.objects.filter(is_active=True)
+        for user in users:
+            logs = Log.objects.filter(
+                user=user,
+                datetime__gte=first_day_of_previous_month,
+                datetime__lt=first_day_of_current_month,
+            ).order_by("datetime")
+
+            # 日ごとのログ数をカウント
+            daily_log_counts = logs.values("datetime__date").annotate(count=Count("id"))
+            daily_log_counts = {item["datetime__date"]: item["count"] for item in daily_log_counts}
+
+            if logs.exists():
+                date = None
+                first_entry = None
+                last_exit = None
+                for log in logs:
+                    log_date = log.datetime.date()
+                    log_time = log.datetime.time()
+                    if date != log_date:
+                        if date:
+                            log_count = daily_log_counts.get(date, 0)
+                            duration = timedelta(minutes=log_count)
+                            duration_str = f"{duration.seconds // 3600:02d}:{(duration.seconds % 3600) // 60:02d}:00"
+                            writer.writerow(
+                                [
+                                    user.name,
+                                    date.strftime("%Y/%m/%d"),
+                                    first_entry.strftime("%H:%M"),
+                                    last_exit.strftime("%H:%M"),
+                                    duration_str,
+                                ]
+                            )
+                        date = log_date
+                        first_entry = log_time
+                    last_exit = log_time
+
+                # 最後の日のデータを書き込み
+                if date:
+                    log_count = daily_log_counts.get(date, 0)
+                    duration = timedelta(minutes=log_count)
+                    duration_str = (
+                        f"{duration.seconds // 3600:02d}:{(duration.seconds % 3600) // 60:02d}:00"
+                    )
+                    writer.writerow(
+                        [
+                            user.name,
+                            date.strftime("%Y/%m/%d"),
+                            first_entry.strftime("%H:%M"),
+                            last_exit.strftime("%H:%M"),
+                            duration_str,
+                        ]
+                    )
+
+    print(f"Monthly report generated and saved to {csv_filepath}")
+    return csv_filepath
+
+
+@shared_task
+def generate_monthly_report_excel():
     now = timezone.now()
     first_day_of_current_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)

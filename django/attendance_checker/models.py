@@ -11,7 +11,7 @@ class User(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def cumulative_time_this_month(self):
-        now = timezone.localtime(timezone.now())
+        now = timezone.localtime()
         start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         logs = Log.objects.filter(user=self, datetime__gte=start_of_month, datetime__lte=now)
         return len(logs) * timedelta(minutes=1)
